@@ -2,6 +2,7 @@ import os
 import json
 import duckdb
 import requests
+import argparse
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -24,6 +25,10 @@ def get_coordinates_by_zip(zip_code: str):
     Returns:
         tuple: latitude, longitude
     """
+    # default to local zip if one is not provided
+    if zip_code is None:
+        zip_code = "85374"
+
     url = BASE_URL + "geo/1.0/zip"
     params = {"zip": zip_code, "appid": OPEN_WEATHER_API_KEY}
     try:
@@ -142,9 +147,23 @@ def load_data_to_db(json_file):
         print("Error loading data to database:", e)
 
 
+def main():
+    parser = argparse.ArgumentParser(description="Fetch data from OpenWeatherMap API.")
+    parser.add_argument("--zip", type=str, help="zip code to query")
+
+    args = parser.parse_args()
+
+    zip_code = args.zip if args.zip else None
+    lat, lon = get_coordinates_by_zip(zip_code)
+
+    if lat:
+        data = get_current_weather(lat, lon)
+        json_file = write_result_to_json(data)
+        create_db()
+        load_data_to_db(json_file)
+    else:
+        print("Failed to fetch location data.")
+
+
 if __name__ == "__main__":
-    lat, lon = get_coordinates_by_zip("85374")
-    data = get_current_weather(lat, lon)
-    json_file = write_result_to_json(data)
-    create_db()
-    load_data_to_db(json_file)
+    main()
