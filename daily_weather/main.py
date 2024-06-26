@@ -14,6 +14,16 @@ JSON_DIR = "data/json"
 
 
 def get_coordinates_by_zip(zip_code: str):
+    """
+    Uses the OpenWeather Geocoding API to retrieve latitude and longitude
+    given a zip code or postal code.
+
+    Args:
+        zip_code (str): zip code for coordinate lookup
+
+    Returns:
+        tuple: latitude, longitude
+    """
     url = BASE_URL + "geo/1.0/zip"
     params = {"zip": zip_code, "appid": OPEN_WEATHER_API_KEY}
     try:
@@ -26,7 +36,18 @@ def get_coordinates_by_zip(zip_code: str):
         return None
 
 
-def get_current_weather(lat, lon):
+def get_current_weather(lat: float, lon: float):
+    """
+    Gets the current weather for a given lat, lon using the OpenWeather
+    Current Weather API.
+
+    Args:
+        lat (float): latitude
+        lon (float): longitude
+
+    Returns:
+        data (dict): API response
+    """
     url = BASE_URL + "data/2.5/weather"
     params = {
         "lat": lat,
@@ -46,7 +67,9 @@ def get_current_weather(lat, lon):
 
 
 def create_db():
-    # check to see if duckdb table exists; create if it does not
+    """
+    Database setup. Creates tables if they do not exist.
+    """
     conn = duckdb.connect("data/weather.db")
 
     with open("daily_weather/sql/create_tables.sql", "r") as f:
@@ -59,7 +82,13 @@ def create_db():
 
 def write_result_to_json(result):
     """
-    Write response results to a JSON file
+    Writes API response to a JSON file for loading into the database.
+
+    Args:
+        result: API response
+
+    Returns:
+        file_path (str): JSON file to load into the database.
     """
 
     # make json dir if not exists
@@ -78,7 +107,7 @@ def write_result_to_json(result):
 
 def load_data_to_db(json_file):
     """
-    Load JSON data to DuckDB
+    Load JSON data fro file to the database.
     """
     try:
         with duckdb.connect("data/weather.db", read_only=False) as con:
