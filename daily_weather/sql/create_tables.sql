@@ -19,3 +19,11 @@ CREATE TABLE IF NOT EXISTS current_weather (
     wind_degrees INTEGER NOT NULL,
     clouds INTEGER NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS location (
+    id INTEGER NOT NULL, 
+    name VARCHAR NOT NULL, 
+    country VARCHAR NOT NULL,
+    lon DOUBLE NOT NULL, 
+    lat DOUBLE NOT NULL
+)

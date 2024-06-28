@@ -110,9 +110,9 @@ def write_result_to_json(result):
     return file_path
 
 
-def load_data_to_db(json_file):
+def load_data_to_current_weather(json_file):
     """
-    Load JSON data fro file to the database.
+    Load JSON data from file to the current_weather relation.
     """
     try:
         with duckdb.connect("data/weather.db", read_only=False) as con:
@@ -147,6 +147,30 @@ def load_data_to_db(json_file):
         print("Error loading data to database:", e)
 
 
+def load_data_to_location():
+    """
+    Add records to the location relation
+    """
+    try:
+        with duckdb.connect("data/weather.db", read_only=False) as con:
+            con.sql(
+                """
+                INSERT INTO location
+                    SELECT DISTINCT
+                        location_id, 
+                        location_name, 
+                        location_country,
+                        location_lon, 
+                        location_lat
+                    FROM current_weather cw
+                    ANTI JOIN location l ON l.id = cw.location_id
+                """
+            )
+            con.table("location").show()
+    except duckdb.Error as e:
+        print("Error loading data to database:", e)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Fetch data from OpenWeatherMap API.")
     parser.add_argument("--zip", type=str, help="zip code to query")
@@ -160,7 +184,8 @@ def main():
         data = get_current_weather(lat, lon)
         json_file = write_result_to_json(data)
         create_db()
-        load_data_to_db(json_file)
+        load_data_to_current_weather(json_file)
+        load_data_to_location()
     else:
         print("Failed to fetch location data.")
 
