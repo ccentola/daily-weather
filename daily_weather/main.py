@@ -171,6 +171,25 @@ def load_data_to_location():
         print("Error loading data to database:", e)
 
 
+def query_saved_locations():
+    try:
+        with duckdb.connect("data/weather.db") as con:
+            con.execute(
+                """
+                SELECT DISTINCT name, lat, lon 
+                FROM location
+                """
+            )
+            for loc in con.fetchall():
+                print(f"Adding record for {loc[0]}...")
+                data = get_current_weather(loc[1], loc[2])
+                json_file = write_result_to_json(data)
+                load_data_to_current_weather(json_file)
+                print(f"{loc[0]} record added to current_weather")
+    except duckdb.Error as e:
+        print(f"DuckDB error: {e}")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Fetch data from OpenWeatherMap API.")
     parser.add_argument("--zip", type=str, help="zip code to query")
@@ -191,4 +210,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    query_saved_locations()
