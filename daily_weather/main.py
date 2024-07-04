@@ -14,7 +14,7 @@ OPEN_WEATHER_API_KEY = os.getenv("OPEN_WEATHER_API_KEY")
 JSON_DIR = "data/json"
 
 
-def get_coordinates_by_zip(zip_code: str):
+def get_coordinates_by_zip(zip_code: str = "85374"):
     """
     Uses the OpenWeather Geocoding API to retrieve latitude and longitude
     given a zip code or postal code.
@@ -25,9 +25,6 @@ def get_coordinates_by_zip(zip_code: str):
     Returns:
         tuple: latitude, longitude
     """
-    # default to local zip if one is not provided
-    if zip_code is None:
-        zip_code = "85374"
 
     url = BASE_URL + "geo/1.0/zip"
     params = {"zip": zip_code, "appid": OPEN_WEATHER_API_KEY}
