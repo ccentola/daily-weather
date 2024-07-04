@@ -2,6 +2,10 @@ certifi==2024.6.2
 charset-normalizer==3.3.2
 duckdb==1.0.0
 idna==3.7
+iniconfig==2.0.0
+packaging==24.1
+pluggy==1.5.0
+pytest==8.2.2
 python-dotenv==1.0.1
 requests==2.32.3
 ruff==0.4.10
